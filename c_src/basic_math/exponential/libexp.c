@@ -18,17 +18,19 @@ static double log_2;
 
 static int load(ErlNifEnv* caller_env, void** priv_data, ERL_NIF_TERM load_info)
 {
-    fast_exponential_16 = (float *)enif_alloc(sizeof(float) * BINARY16_EXPONENT_1 * (1 << BINARY16_FRACTION_BITS));
+    fast_exponential_16 = (float *)enif_alloc(sizeof(float) * (BINARY16_EXPONENT_1 * (1 << BINARY16_FRACTION_BITS) + 1));
     if(__builtin_expect(fast_exponential_16 == NULL, false)) {
         return 1;
     }
+    union f16 t;
     for(uint_fast8_t e = 0; e < BINARY16_EXPONENT_1; e++) {
         for(uint_fast16_t f = 0; f < (1 << BINARY16_FRACTION_BITS); f++) {
-            union f16 t;
             t.u = ((e << BINARY16_FRACTION_BITS) | f);
             fast_exponential_16[t.u] = powf(2.0, t.f);
         }
     }
+    t.u = BINARY16_EXPONENT_1 * (1 << BINARY16_FRACTION_BITS);
+    fast_exponential_16[t.u] = powf(2.0, t.f);
     log_2 = log(2);
     *priv_data = fast_exponential_16;
     return 0;
@@ -61,18 +63,14 @@ static ERL_NIF_TERM exp16(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         }
         x = (double)n;
     }
-    if(x == 0.0) {
+    if(__builtin_expect(x == 0.0, false)) {
         return enif_make_double(env, 1.0);
     }
-    x = x / log_2;
+    x /= log_2;
     ErlNifSInt64 xi = (ErlNifSInt64)floor(x);
     union f16 xf;
     xf.f = (_Float16)(x - xi);
     uint_fast8_t exponent = (xf.u >> BINARY16_FRACTION_BITS);
-    if(__builtin_expect(exponent == 16, false)) {
-        xi++;
-        xf.f = (_Float16)0.0;
-    }
     union f16 xi2;
     xi2.u = ((BINARY16_EXPONENT_1 - 1 + xi) << BINARY16_FRACTION_BITS);
     return enif_make_double(env, (double)xi2.f * fast_exponential_16[xf.u]);
