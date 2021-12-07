@@ -6,15 +6,12 @@ defmodule BasicMath.Exponential.FastExponential do
   def init() do
     :ets.new(:fast_exponential_16, [:set, :public, :named_table])
 
-    0..15
-    |> Enum.map(fn e ->
-      0..1023
-      |> Enum.map(fn f ->
-        <<v::float-16>> = <<0::size(1), e::size(5), f::size(10)>>
-        {(e <<< 10) + f, v}
-      end)
+    0..(16 * 1024 - 1)
+    |> Enum.map(fn t ->
+      <<e::size(5), f::size(10)>> = <<t::size(15)>>
+      <<v::float-16>> = <<0::size(1), e::size(5), f::size(10)>>
+      {(e <<< 10) + f, v}
     end)
-    |> List.flatten()
     |> Enum.map(fn {key, value} -> {key, :math.pow(2, value)} end)
     |> Enum.each(fn {key, value} -> :ets.insert(:fast_exponential_16, {key, value}) end)
   end
