@@ -4,7 +4,7 @@ defmodule BasicMath.Exponential.FastExponential do
   @log2 :math.log(2)
 
   def init() do
-    :ets.new(:fast_exponential, [:set, :public, :named_table])
+    :ets.new(:fast_exponential_16, [:set, :public, :named_table])
 
     0..15
     |> Enum.map(fn e ->
@@ -16,7 +16,7 @@ defmodule BasicMath.Exponential.FastExponential do
     end)
     |> List.flatten()
     |> Enum.map(fn {key, value} -> {key, :math.pow(2, value)} end)
-    |> Enum.each(fn {key, value} -> :ets.insert(:fast_exponential, {key, value}) end)
+    |> Enum.each(fn {key, value} -> :ets.insert(:fast_exponential_16, {key, value}) end)
   end
 
   def exp16(0), do: 1.0
@@ -36,7 +36,7 @@ defmodule BasicMath.Exponential.FastExponential do
       end
 
     key = (exponent <<< 10) + fraction
-    [{^key, result}] = :ets.lookup(:fast_exponential, key)
+    [{^key, result}] = :ets.lookup(:fast_exponential_16, key)
     <<xi2::float-16>> = <<0::size(1), 15 + xi::size(5), 0::size(10)>>
     xi2 * result
   end
