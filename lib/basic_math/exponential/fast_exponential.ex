@@ -10,7 +10,7 @@ defmodule BasicMath.Exponential.FastExponential do
     |> Enum.map(fn t ->
       <<e::size(5), f::size(10)>> = <<t::size(15)>>
       <<v::float-16>> = <<0::size(1), e::size(5), f::size(10)>>
-      {(e <<< 10) + f, v}
+      {t, v}
     end)
     |> Enum.map(fn {key, value} -> {key, :math.pow(2, value)} end)
     |> Enum.each(fn {key, value} -> :ets.insert(:fast_exponential_16, {key, value}) end)
