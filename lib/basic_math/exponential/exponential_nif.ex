@@ -15,8 +15,8 @@ defmodule BasicMath.Exponential.ExponentialNif do
     end
   end
 
-  @spec init() :: :ok
-  def init() do
+  @spec exp16(number()) :: number()
+  def exp16(_x) do
     :erlang.nif_error(:nif_not_loaded)
   end
 end
