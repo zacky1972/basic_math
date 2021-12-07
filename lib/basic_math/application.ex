@@ -8,6 +8,7 @@ defmodule BasicMath.Application do
   @impl true
   def start(_type, _args) do
     BasicMath.Factorial.FactorialEts.init()
+    BasicMath.Exponential.FastExponential.init()
 
     children = [
       # Starts a worker by calling: BasicMath.Worker.start_link(arg)
