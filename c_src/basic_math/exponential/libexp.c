@@ -63,9 +63,6 @@ static ERL_NIF_TERM exp16(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         }
         x = (double)n;
     }
-    if(__builtin_expect(x == 0.0, false)) {
-        return enif_make_double(env, 1.0);
-    }
     x /= log_2;
     ErlNifSInt64 xi = (ErlNifSInt64)floor(x);
     union f16 xf;
