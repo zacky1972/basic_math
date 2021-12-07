@@ -70,7 +70,6 @@ static ERL_NIF_TERM exp16(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     ErlNifSInt64 xi = (ErlNifSInt64)floor(x);
     union f16 xf;
     xf.f = (_Float16)(x - xi);
-    uint_fast8_t exponent = (xf.u >> BINARY16_FRACTION_BITS);
     union f16 xi2;
     xi2.u = ((BINARY16_EXPONENT_1 - 1 + xi) << BINARY16_FRACTION_BITS);
     return enif_make_double(env, (double)xi2.f * fast_exponential_16[xf.u]);
