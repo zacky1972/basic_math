@@ -1,6 +1,4 @@
 defmodule BasicMath.Exponential.FastExponential do
-  use Bitwise
-
   @log2 :math.log(2)
 
   def init() do
@@ -24,16 +22,16 @@ defmodule BasicMath.Exponential.FastExponential do
     x = x / @log2
     xi = Float.floor(x) |> round()
     xf = x - xi
-    <<0::size(1), exponent::size(5), fraction::size(10)>> = <<xf::float-16>>
+    <<0::size(1), t::size(15)>> = <<xf::float-16>>
+    <<exponent::size(5), _fraction::size(10)>> = <<t::size(15)>>
 
-    {xi, fraction} =
+    {xi, t} =
       case exponent do
         16 -> {xi + 1, 0}
-        _ -> {xi, fraction}
+        _ -> {xi, t}
       end
 
-    key = (exponent <<< 10) + fraction
-    [{^key, result}] = :ets.lookup(:fast_exponential_16, key)
+    [{^t, result}] = :ets.lookup(:fast_exponential_16, t)
     <<xi2::float-16>> = <<0::size(1), 15 + xi::size(5), 0::size(10)>>
     xi2 * result
   end
