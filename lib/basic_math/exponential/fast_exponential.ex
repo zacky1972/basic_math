@@ -37,7 +37,7 @@ defmodule BasicMath.Exponential.FastExponential do
 
     key = (exponent <<< 10) + fraction
     [{^key, result}] = :ets.lookup(:fast_exponential, key)
-    <<xi2::float-16>> = <<0::size(1), (15 + xi)::size(5), 0::size(10)>>
+    <<xi2::float-16>> = <<0::size(1), 15 + xi::size(5), 0::size(10)>>
     xi2 * result
   end
 end
